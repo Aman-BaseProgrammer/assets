@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)file:///F:/data-insights-compact.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Customer Behavior Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top right, #1e3a8a 0%, #1e293b 50%, #0f172a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated World Map Background */
+        .world-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(59, 130, 246, 0.4);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .dot:nth-child(odd) { animation-delay: 0.5s; }
+        .dot:nth-child(3n) { animation-delay: 1s; }
+        .dot:nth-child(5n) { animation-delay: 1.5s; }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: scale(2);
+                opacity: 1;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header with Globe Icon */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .globe-icon {
+            font-size: 5rem;
+            display: inline-block;
+            animation: spin 20s linear infinite;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.6));
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #cbd5e0;
+            line-height: 1.7;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Regional Cards - Map Style Layout */
+        .regions-section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out 0.3s backwards;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '◆◆◆';
+            display: block;
+            font-size: 1rem;
+            color: #3b82f6;
+            margin-bottom: 10px;
+            letter-spacing: 10px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .regions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .region-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: scaleRotate 0.6s ease-out backwards;
+            cursor: pointer;
+        }
+
+        .region-card:nth-child(1) {
+            animation-delay: 0.4s;
+            grid-column: 1 / 2;
+        }
+
+        .region-card:nth-child(2) {
+            animation-delay: 0.5s;
+            grid-column: 2 / 3;
+        }
+
+        .region-card:nth-child(3) {
+            animation-delay: 0.6s;
+            grid-column: 3 / 4;
+        }
+
+        .region-card:nth-child(4) {
+            animation-delay: 0.7s;
+            grid-column: 1 / 3;
+        }
+
+        .region-card:nth-child(5) {
+            animation-delay: 0.8s;
+            grid-column: 3 / 4;
+        }
+
+        @keyframes scaleRotate {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .region-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .region-card:hover::before {
+            opacity: 1;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .region-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.4);
+        }
+
+        .region-flag {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 15px;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .region-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #60a5fa;
+        }
+
+        .region-stat {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .region-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* Insights Timeline */
+        .insights-section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out 0.9s backwards;
+        }
+
+        .insights-timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding-left: 40px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 50%, #f472b6 100%);
+            animation: growDown 1.5s ease-out;
+        }
+
+        @keyframes growDown {
+            from { height: 0; }
+            to { height: 100%; }
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+            animation: slideInLeft 0.6s ease-out backwards;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 1s; }
+        .timeline-item:nth-child(2) { animation-delay: 1.1s; }
+        .timeline-item:nth-child(3) { animation-delay: 1.2s; }
+        .timeline-item:nth-child(4) { animation-delay: 1.3s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            background: #3b82f6;
+            border: 3px solid #0f172a;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px 25px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(10px);
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+
+        .timeline-text {
+            font-size: 0.95rem;
+            color: #cbd5e0;
+            line-height: 1.6;
+        }
+
+        /* Impact Dashboard */
+        .impact-section {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 30px;
+            padding: 45px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: zoomInRotate 0.8s ease-out 1.4s backwards;
+        }
+
+        @keyframes zoomInRotate {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotate(-5deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .impact-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L35 10L45 10L37 17L40 27L30 20L20 27L23 17L15 10L25 10Z' fill='rgba(59,130,246,0.1)'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            animation: moveStars 20s linear infinite;
+        }
+
+        @keyframes moveStars {
+            from { transform: translateX(0) translateY(0); }
+            to { transform: translateX(-60px) translateY(-60px); }
+        }
+
+        .impact-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .impact-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+        }
+
+        .impact-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .impact-stat {
+            text-align: center;
+            animation: bounceIn 0.6s ease-out backwards;
+        }
+
+        .impact-stat:nth-child(1) { animation-delay: 1.5s; }
+        .impact-stat:nth-child(2) { animation-delay: 1.6s; }
+        .impact-stat:nth-child(3) { animation-delay: 1.7s; }
+
+        @keyframes bounceIn {
+            from {
+                opacity: 0;
+                transform: scale(0.3) translateY(-50px);
+            }
+            60% {
+                transform: scale(1.1) translateY(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .impact-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #60a5fa;
+            display: block;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.6);
+        }
+
+        .impact-label {
+            font-size: 1rem;
+            color: #cbd5e0;
+            font-weight: 600;
+        }
+
+        .impact-text {
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .highlight {
+            color: #60a5fa;
+            font-weight: 700;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .regions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .region-card:nth-child(1),
+            .region-card:nth-child(2),
+            .region-card:nth-child(3),
+            .region-card:nth-child(4),
+            .region-card:nth-child(5) {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .regions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .impact-stats {
+                gap: 30px;
+            }
+
+            .impact-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated World Dots -->
+    <div class="world-dots">
+        <div class="dot" style="top: 20%; left: 15%;"></div>
+        <div class="dot" style="top: 35%; left: 25%;"></div>
+        <div class="dot" style="top: 45%; left: 45%;"></div>
+        <div class="dot" style="top: 55%; left: 65%;"></div>
+        <div class="dot" style="top: 30%; left: 75%;"></div>
+        <div class="dot" style="top: 60%; left: 85%;"></div>
+        <div class="dot" style="top: 70%; left: 30%;"></div>
+        <div class="dot" style="top: 25%; left: 55%;"></div>
+        <div class="dot" style="top: 80%; left: 50%;"></div>
+        <div class="dot" style="top: 15%; left: 85%;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="globe-icon">🌍</div>
+            <h1>Global Customer Behavior Analysis</h1>
+            <p>Analyzed customer behavior across countries to understand demand and pricing sensitivity. Supported growth decisions by identifying patterns across regions and markets.</p>
+        </div>
+
+        <!-- Regional Analysis -->
+        <section class="regions-section">
+            <h2 class="section-title">Regional Insights</h2>
+            <div class="regions-grid">
+                <div class="region-card">
+                    <span class="region-flag">🇺🇸</span>
+                    <h3 class="region-name">North America</h3>
+                    <div class="region-stat">$8.2M</div>
+                    <div class="region-label">High demand, premium pricing</div>
+                </div>
+
+                <div class="region-card">
+                    <span class="region-flag">🇪🇺</span>
+                    <h3 class="region-name">Europe</h3>
+                    <div class="region-stat">$6.4M</div>
+                    <div class="region-label">Moderate sensitivity, stable growth</div>
+                </div>
+
+                <div class="region-card">
+                    <span class="region-flag">🇸🇬</span>
+                    <h3 class="region-name">APAC</h3>
+                    <div class="region-stat">$9.1M</div>
+                    <div class="region-label">High growth, price conscious</div>
+                </div>
+
+                <div class="region-card">
+                    <span class="region-flag">🇧🇷</span>
+                    <h3 class="region-name">Latin America</h3>
+                    <div class="region-stat">$2.7M</div>
+                    <div class="region-label">Emerging, localized pricing</div>
+                </div>
+
+                <div class="region-card">
+                    <span class="region-flag">🇿🇦</span>
+                    <h3 class="region-name">Africa</h3>
+                    <div class="region-stat">$1.8M</div>
+                    <div class="region-label">Early adopters, value-driven</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Insights Timeline -->
+        <section class="insights-section">
+            <h2 class="section-title">Key Patterns Discovered</h2>
+            <div class="insights-timeline">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Price Sensitivity Mapping</h3>
+                        <p class="timeline-text">APAC and LATAM regions showed 3x higher price sensitivity compared to North America, requiring localized pricing strategies.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Demand Seasonality</h3>
+                        <p class="timeline-text">Identified distinct seasonal patterns by region, with Q4 peaks in US/EU and Q2 peaks in APAC markets.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Feature Preferences</h3>
+                        <p class="timeline-text">European customers prioritized data privacy features while APAC emphasized mobile-first experiences and integrations.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Market Entry Opportunities</h3>
+                        <p class="timeline-text">Analyzed untapped segments in Africa and Southeast Asia showing 45% higher growth potential than mature markets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Impact Dashboard -->
+        <section class="impact-section">
+            <div class="impact-content">
+                <h2 class="impact-title">Global Growth Impact</h2>
+                <div class="impact-stats">
+                    <div class="impact-stat">
+                        <span class="impact-number">+52%</span>
+                        <div class="impact-label">International Revenue</div>
+                    </div>
+                    <div class="impact-stat">
+                        <span class="impact-number">12</span>
+                        <div class="impact-label">New Markets Entered</div>
+                    </div>
+                    <div class="impact-stat">
+                        <span class="impact-number">-28%</span>
+                        <div class="impact-label">CAC Reduction</div>
+                    </div>
+                </div>
+                <p class="impact-text">
+                    By analyzing <span class="highlight">customer behavior patterns across countries</span>, we identified region-specific 
+                    demand drivers and pricing sensitivities that enabled <span class="highlight">data-driven market expansion</span>. 
+                    The insights supported localized go-to-market strategies, optimized pricing tiers by region, and prioritized 
+                    high-potential markets—resulting in <span class="highlight">52% international revenue growth</span> and successful 
+                    entry into 12 new markets with significantly reduced customer acquisition costs.
+                </p>
+            </div>
+        </section>
+    </div>
+
+</body></html>
